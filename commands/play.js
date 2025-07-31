@@ -1,10 +1,10 @@
 import { EmbedBuilder } from 'discord.js';
 
 export default {
-  name: 'p',
+  name: 'play',
   description: 'Zmuś MrQiusa do puszczenia muzyczki z YouTube',
-  async execute(message, args) {
-    const voiceChannel = message.member.voice.channel;
+  async execute(interaction) {
+    const voiceChannel = interaction.member.voice.channel;
 
     if (!voiceChannel) {
       const embed = new EmbedBuilder()
@@ -15,13 +15,13 @@ export default {
         )
         .setFooter({
           text: 'MusiQ Bot',
-          iconURL: message.client.user.avatarURL(),
+          iconURL: interaction.client.user.avatarURL(),
         });
 
-      return message.reply({ embeds: [embed] });
+      return interaction.reply({ embeds: [embed] });
     }
 
-    const permissions = voiceChannel.permissionsFor(message.client.user);
+    const permissions = voiceChannel.permissionsFor(interaction.client.user);
     if (!permissions.has('CONNECT') || !permissions.has('SPEAK')) {
       const embed = new EmbedBuilder()
         .setColor('#FFA500') // Pomarańczowy kolor dla ostrzeżenia
@@ -31,25 +31,25 @@ export default {
         )
         .setFooter({
           text: 'MrQius Bot',
-          iconURL: message.client.user.avatarURL(),
+          iconURL: interaction.client.user.avatarURL(),
         });
 
-      return message.reply({ embeds: [embed] });
+      return interaction.reply({ embeds: [embed] });
     }
 
-    const query = args.join(' ');
+    const query = interaction.options.getString('song');
 
     if (!query) {
       const embed = new EmbedBuilder()
-        .setColor('#00FF00') // Zielony kolor dla informacji
+        .setColor('#00FF00')
         .setTitle('🎵 Podaj tytuł piosenki!')
-        .setDescription('📖 Przykład: `.play White 2115 - California`')
+        .setDescription('📖 Przykład: `/play White 2115 - California`')
         .setFooter({
           text: 'MrQius Bot',
-          iconURL: message.client.user.avatarURL(),
+          iconURL: interaction.client.user.avatarURL(),
         });
 
-      return message.reply({ embeds: [embed] });
+      return interaction.reply({ embeds: [embed] });
     }
 
     try {
@@ -59,44 +59,48 @@ export default {
         .setDescription('⏳ Chwila cierpliwości!')
         .setFooter({
           text: 'MrQius Bot',
-          iconURL: message.client.user.avatarURL(),
+          iconURL: interaction.client.user.avatarURL(),
         });
 
-      const loadingMsg = await message.reply({ embeds: [loadingEmbed] });
+      const loadingMsg = await interaction.reply({ embeds: [loadingEmbed] });
 
-      const { track } = await message.client.player.play(voiceChannel, query, {
-        nodeOptions: {
-          metadata: {
-            channel: message.channel,
-            client: message.guild.members.me,
-            requestedBy: message.user,
-          },
-          ytdlOptions: {
-            quality:
-              'highestaudio[ext=webm]/highestaudio[ext=m4a]/highestaudio',
-            highWaterMark: 1 << 25,
-            dlChunkSize: 0,
-            filter: 'audioonly',
-            requestOptions: {
-              headers: {
-                'User-Agent':
-                  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      const { track } = await interaction.client.player.play(
+        voiceChannel,
+        query,
+        {
+          nodeOptions: {
+            metadata: {
+              channel: interaction.channel,
+              client: interaction.guild.members.me,
+              requestedBy: interaction.user,
+            },
+            ytdlOptions: {
+              quality:
+                'highestaudio[ext=webm]/highestaudio[ext=m4a]/highestaudio',
+              highWaterMark: 1 << 25,
+              dlChunkSize: 0,
+              filter: 'audioonly',
+              requestOptions: {
+                headers: {
+                  'User-Agent':
+                    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                },
+              },
+              liveBuffer: 40000,
+              isHLS: false,
+              begin: '0s',
+              range: {
+                start: 0,
+                end: Infinity,
               },
             },
-            liveBuffer: 40000,
-            isHLS: false,
-            begin: '0s',
-            range: {
-              start: 0,
-              end: Infinity,
-            },
+            volume: 100,
+            leaveOnEmpty: true,
+            leaveOnEnd: true,
+            leaveOnStop: true,
           },
-          volume: 100,
-          leaveOnEmpty: true,
-          leaveOnEnd: true,
-          leaveOnStop: true,
-        },
-      });
+        }
+      );
 
       const successEmbed = new EmbedBuilder()
         .setColor('#00FF00') // Zielony kolor dla sukcesu
@@ -107,7 +111,7 @@ export default {
         .setThumbnail(track.thumbnail) // Miniaturka utworu
         .setFooter({
           text: 'MrQius Bot',
-          iconURL: message.client.user.avatarURL(),
+          iconURL: interaction.client.user.avatarURL(),
         });
 
       await loadingMsg.edit({ embeds: [successEmbed] });
@@ -120,10 +124,10 @@ export default {
         .setDescription('🤔 Może spróbuj podać bardziej precyzyjny tytuł?')
         .setFooter({
           text: 'MrQius Bot',
-          iconURL: message.client.user.avatarURL(),
+          iconURL: interaction.client.user.avatarURL(),
         });
 
-      await message.reply({ embeds: [errorEmbed] });
+      await interaction.reply({ embeds: [errorEmbed] });
     }
   },
 };
