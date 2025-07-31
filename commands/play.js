@@ -68,6 +68,7 @@ export default {
         voiceChannel,
         query,
         {
+          quality: 'highestaudio',
           nodeOptions: {
             metadata: {
               channel: interaction.channel,
@@ -127,7 +128,11 @@ export default {
           iconURL: interaction.client.user.avatarURL(),
         });
 
-      await interaction.reply({ embeds: [errorEmbed] });
+      if (!interaction.replied) {
+        await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+      } else {
+        await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
+      }
     }
   },
 };
