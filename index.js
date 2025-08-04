@@ -5,6 +5,7 @@ import { Player } from 'discord-player';
 import { DefaultExtractors } from '@discord-player/extractor';
 import { GuildQueueEvent } from 'discord-player';
 import { YoutubeiExtractor } from 'discord-player-youtubei';
+import http from 'http';
 
 const client = new Discord.Client({
   intents: [
@@ -64,8 +65,10 @@ const player = new Player(client, {
   noEmitInsert: false,
 });
 
+// Load all default extractors
 player.extractors.loadMulti(DefaultExtractors);
 
+// Load YouTube extractor
 player.extractors.loadMulti([YoutubeiExtractor]);
 
 client.player = player;
@@ -95,6 +98,17 @@ player.events.on('playerError', (queue, error) => {
 player.events.on(GuildQueueEvent.PlayerFinish, async (queue, track) => {
   const { channel } = queue.metadata;
   await channel.send(`Koniec mych boleści, pora na Łajciora 🤙🏻`);
+});
+
+// Simple HTTP server for Railway healthcheck
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('MusiQ Bot is running! 🎵');
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(`HTTP server running on port ${PORT}`);
 });
 
 client.on('messageCreate', (message) => {

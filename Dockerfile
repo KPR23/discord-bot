@@ -22,7 +22,7 @@ RUN pnpm install
 # Copy source code
 COPY . .
 
-# Expose port
+# Expose port for HTTP server
 EXPOSE 3000
 
 # Start the application
