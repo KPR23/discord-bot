@@ -9,12 +9,13 @@ const { clientId, guildId, token } = config;
 const commands = [
   {
     name: 'play',
-    description: 'Odtwórz piosenkę z YouTube lub innej platformy',
+    description: `MrQius puści muzyczkę ze swojego JBL'a`,
     options: [
       {
         name: 'song',
         type: 3,
-        description: 'Tytuł piosenki lub link do odtworzenia',
+        description:
+          'Tytuł piosenki lub link do odtworzenia, po query możesz dodaćprovider (yt, sc, sp, am, vm, rn)',
         required: true,
       },
     ],

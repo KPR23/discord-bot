@@ -7,17 +7,22 @@ import {
 export default {
   name: 'help',
   description: 'Wyświetl listę dostępnych komend bota',
-  async execute(message) {
-    const commands = message.client.commands; // Pobierz wszystkie komendy
+  async execute(interaction) {
+    const commands = interaction.client.commands; // Pobierz wszystkie komendy
 
     // Embed z opisem
     const embed = new EmbedBuilder()
       .setColor('#00FF00')
       .setTitle('📜 Lista dostępnych komend')
       .setDescription('Wybierz komendę z menu poniżej, aby zobaczyć szczegóły.')
+      .addFields({
+        name: '🎵 Nowa funkcja: Prefiksy dostawców',
+        value:
+          'Możesz teraz określić dostawcę muzyki dodając prefiks na końcu zapytania:\n• `.yt` - YouTube\n• `.sc` - SoundCloud\n• `.sp` - Spotify\n• `.am` - Apple Music\n• `.vm` - Vimeo\n• `.rn` - ReverbNation\n\nPrzykład: `/play White 2115 .yt`',
+      })
       .setFooter({
-        text: 'MrQius Bot',
-        iconURL: message.client.user.avatarURL(),
+        text: 'MusiQ',
+        iconURL: interaction.client.user.avatarURL(),
       });
 
     // Tworzenie menu wyboru
@@ -36,20 +41,19 @@ export default {
     const row = new ActionRowBuilder().addComponents(selectMenu);
 
     // Wyślij wiadomość z embedem i menu wyboru
-    await message.reply({ embeds: [embed], components: [row] });
+    await interaction.reply({ embeds: [embed], components: [row] });
 
     // Obsługa interakcji z menu wyboru
-    const filter = (interaction) =>
-      interaction.customId === 'select-command' &&
-      interaction.user.id === message.author.id;
+    const filter = (i) =>
+      i.customId === 'select-command' && i.user.id === interaction.user.id;
 
-    const collector = message.channel.createMessageComponentCollector({
+    const collector = interaction.channel.createMessageComponentCollector({
       filter,
       time: 60000, // Czas na interakcję (60 sekund)
     });
 
-    collector.on('collect', async (interaction) => {
-      const selectedCommand = commands.get(interaction.values[0]); // Pobierz wybraną komendę
+    collector.on('collect', async (i) => {
+      const selectedCommand = commands.get(i.values[0]); // Pobierz wybraną komendę
       if (!selectedCommand) return;
 
       // Wyświetl szczegóły wybranej komendy
@@ -58,16 +62,18 @@ export default {
         .setTitle(`📖 Szczegóły komendy: ${selectedCommand.name}`)
         .setDescription(selectedCommand.description)
         .setFooter({
-          text: 'MrQius Bot',
-          iconURL: message.client.user.avatarURL(),
+          text: 'MusiQ',
+          iconURL: interaction.client.user.avatarURL(),
         });
 
-      await interaction.update({ embeds: [commandEmbed], components: [] }); // Zaktualizuj wiadomość
+      await i.update({ embeds: [commandEmbed], components: [] }); // Zaktualizuj wiadomość
     });
 
     collector.on('end', () => {
       // Usuń interaktywne elementy po zakończeniu czasu
-      message.edit({ components: [] });
+      interaction.editReply({ components: [] }).catch(() => {
+        // Ignore errors if message was deleted
+      });
     });
   },
 };
