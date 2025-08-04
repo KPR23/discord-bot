@@ -15,7 +15,7 @@ const commands = [
         name: 'song',
         type: 3,
         description:
-          'Tytuł piosenki lub link do odtworzenia, po query możesz dodaćprovider (yt, sc, sp, am, vm, rn)',
+          'Tytuł piosenki lub link do odtworzenia, po query możesz dodać provider (.yt, .sc, .sp, .am, .vm, .rn)',
         required: true,
       },
     ],

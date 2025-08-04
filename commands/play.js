@@ -135,6 +135,7 @@ export default {
           leaveOnEmpty: true,
           leaveOnEnd: true,
           leaveOnStop: true,
+          skipFFmpeg: true,
         },
       };
 

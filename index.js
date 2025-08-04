@@ -43,7 +43,7 @@ const player = new Player(client, {
   },
   connectionTimeout: 20000,
   bufferingTimeout: 1000,
-  skipFFmpeg: false,
+  skipFFmpeg: true,
   disableVolume: false,
   disableEqualizer: false,
   disableFilterer: false,

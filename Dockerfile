@@ -1,7 +1,12 @@
-FROM node:20-alpine
+FROM node:20
 
-# Install FFmpeg
-RUN apk add --no-cache ffmpeg
+# Install FFmpeg and other dependencies
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
