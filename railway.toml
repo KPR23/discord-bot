@@ -1,0 +1,13 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "node index.js"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+
+[build.environment]
+NIXPACKS_NODE_VERSION = "20"
+
+[build.scripts]
+"install-ffmpeg" = "apt-get update && apt-get install -y ffmpeg" 
